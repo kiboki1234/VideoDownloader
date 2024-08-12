@@ -9,9 +9,9 @@ const VideoDownloader = () => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const ws = new WebSocket(`${wsProtocol}://vercel.com/espinandres01s-projects/backend`);
-
+        // Establece la conexión WebSocket con el backend en Vercel
+        const ws = new WebSocket('wss://backend-blue-eta.vercel.app/api/websocket');
+        
         ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
             if (message.progress !== null) {
@@ -34,7 +34,8 @@ const VideoDownloader = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://vercel.com/espinandres01s-projects/backend/api/download', { url }, { responseType: 'blob' });
+            // Realiza la petición POST al endpoint de Vercel para descargar el video
+            const response = await axios.post('https://backend-blue-eta.vercel.app/api/download', { url }, { responseType: 'blob' });
 
             const contentType = response.headers['content-type'];
             const blob = new Blob([response.data], { type: contentType });
