@@ -35,7 +35,7 @@ const VideoDownloader = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://videodownloaderbackend.onrender.com/api/download', { url }, { responseType: 'blob' });
+            const response = await axios.post('http://videodownloaderbackend.onrender.com/api/download', { url }, { responseType: 'blob' });
 
             const contentType = response.headers['content-type'];
             const blob = new Blob([response.data], { type: contentType });
