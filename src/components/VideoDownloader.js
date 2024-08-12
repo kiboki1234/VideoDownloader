@@ -1,5 +1,3 @@
-// src/components/VideoDownloader.js
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './VideoDownloader.css';
@@ -11,8 +9,9 @@ const VideoDownloader = () => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:5000');
-        
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${wsProtocol}://vercel.com/espinandres01s-projects/backend`);
+
         ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
             if (message.progress !== null) {
@@ -35,7 +34,7 @@ const VideoDownloader = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/download', { url }, { responseType: 'blob' });
+            const response = await axios.post('https://vercel.com/espinandres01s-projects/backend/api/download', { url }, { responseType: 'blob' });
 
             const contentType = response.headers['content-type'];
             const blob = new Blob([response.data], { type: contentType });
