@@ -11,7 +11,7 @@ const VideoDownloader = () => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:5000');
+        const ws = new WebSocket('wss://video-downloader-backend-seven.vercel.app');
         
         ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
@@ -35,7 +35,7 @@ const VideoDownloader = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/download', { url }, { responseType: 'blob' });
+            const response = await axios.post('https://video-downloader-backend-seven.vercel.app/api/download', { url }, { responseType: 'blob' });
 
             const contentType = response.headers['content-type'];
             const blob = new Blob([response.data], { type: contentType });
