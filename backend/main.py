@@ -44,10 +44,26 @@ def get_unique_filename(base_name, extension):
 @app.post("/download/mp4/")
 async def download_mp4(url: str = Form(...)):
     try:
-        # Generar nombre único para el archivo
-        file_path = get_unique_filename("video", ".mp4")
+        # Extraer título del video y generar nombre basado en el título
+        title_command = [
+            "yt-dlp",
+            "--get-title",
+            "--no-playlist",
+            url
+        ]
+        title_result = subprocess.run(title_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        title = title_result.stdout.strip()
 
-        # Usa encabezados HTTP personalizados para evitar bloqueos
+        if not title:
+            raise HTTPException(status_code=500, detail="No se pudo obtener el título del video.")
+
+        # Reemplazar caracteres inválidos para nombres de archivo
+        safe_title = "".join([c if c.isalnum() or c in " -_." else "_" for c in title])
+
+        # Crear ruta de archivo única
+        file_path = os.path.join(DOWNLOAD_DIR, f"{safe_title}.mp4")
+
+        # Descargar el video
         command = [
             "yt-dlp",
             "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
@@ -58,11 +74,11 @@ async def download_mp4(url: str = Form(...)):
         ]
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        # Log output para depuración
+        # Log para depuración
         print(result.stdout.decode("utf-8"))
         print(result.stderr.decode("utf-8"))
 
-        # Verificar si el archivo existe antes de devolver la ruta
+        # Verificar si el archivo existe
         if not os.path.exists(file_path):
             raise HTTPException(status_code=500, detail="El archivo no fue generado correctamente.")
 
@@ -75,10 +91,26 @@ async def download_mp4(url: str = Form(...)):
 @app.post("/convert/mp3/")
 async def convert_to_mp3(url: str = Form(...)):
     try:
-        # Generar nombre único para el archivo
-        file_path = get_unique_filename("audio", ".mp3")
+        # Obtener el título del video
+        title_command = [
+            "yt-dlp",
+            "--get-title",
+            "--no-playlist",
+            url
+        ]
+        title_result = subprocess.run(title_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        title = title_result.stdout.strip()
 
-        # Usa encabezados HTTP personalizados para evitar bloqueos
+        if not title:
+            raise HTTPException(status_code=500, detail="No se pudo obtener el título del video.")
+
+        # Reemplazar caracteres inválidos
+        safe_title = "".join([c if c.isalnum() or c in " -_." else "_" for c in title])
+
+        # Crear archivo de salida
+        file_path = os.path.join(DOWNLOAD_DIR, f"{safe_title}.mp3")
+
+        # Descargar y convertir el audio
         command = [
             "yt-dlp",
             "-x",
@@ -89,11 +121,11 @@ async def convert_to_mp3(url: str = Form(...)):
         ]
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        # Log output para depuración
+        # Log para depuración
         print(result.stdout.decode("utf-8"))
         print(result.stderr.decode("utf-8"))
 
-        # Verificar si el archivo existe antes de devolver la ruta
+        # Verificar si el archivo existe
         if not os.path.exists(file_path):
             raise HTTPException(status_code=500, detail="El archivo no fue generado correctamente.")
 
