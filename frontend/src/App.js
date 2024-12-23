@@ -1,5 +1,6 @@
 import React from 'react';
 import Downloader from './components/Downloader';
+import './App.css'
 
 function App() {
   return (
@@ -10,8 +11,8 @@ function App() {
       <main>
         <Downloader />
       </main>
-      <footer>
-        <p>Desarrollado por [Tu Nombre]</p>
+      <footer style={{ textAlign: 'center', marginTop: '20px', padding: '10px', fontSize: '12px', color: 'white' }}>
+                &copy; {new Date().getFullYear()} Kibotech. Todos los derechos reservados.
       </footer>
     </div>
   );
